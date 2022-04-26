@@ -12,12 +12,6 @@ pipeline {
 
   stages {
 
-    stage('Checkout Source') {
-      steps {
-        git branch: 'main', url: 'https://github.com/nikyta384/test-project-nginx.git'
-      }
-    }
-
     stage('Kaniko Build & Push Image') {
       steps {
         container('kaniko') {
