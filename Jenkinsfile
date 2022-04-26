@@ -1,46 +1,41 @@
 pipeline {
 
-  environment {
-    registry = "nikyta384/nginx-test"
-    dockerImage = ""
+  options {
+    ansiColor('xterm')
   }
 
-  agent any
+  agent {
+    kubernetes {
+      yamlFile 'builderkaniko.yaml'
+    }
+  }
 
   stages {
 
-    stage('Checkout Source') {
+    stage('Kaniko Build & Push Image') {
       steps {
-        git branch: 'main', url: 'https://github.com/nikyta384/test-project-nginx.git'
-      }
-    }
- 
-    stage('Build image') {
-      steps{
-        script {
-          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+        container('kaniko') {
+          script {
+            sh '''
+            /kaniko/executor --dockerfile `pwd`/Dockerfile \
+                             --context `pwd` \
+                             --destination=nikyta384/nginx-test:${BUILD_NUMBER}
+            '''
+          }
         }
       }
     }
 
-    stage('Push Image') {
-      steps{
-        script {
-          docker.withRegistry( "" ) {
-            dockerImage.push()
-        }
-      }
-    }
-  }
-
-    stage('Deploying App to Kubernetes') {
+    stage('Deploy App to Kubernetes') {     
       steps {
-        script {
-          kubernetesDeploy(configs: "deploynginx.yml", kubeconfigId: "my_kubernetes")
+        container('kubectl') {
+          withCredentials([file(credentialsId: 'my_kubernetes', variable: 'KUBECONFIG')]) {
+            sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" deploynginx.yaml'
+            sh 'kubectl apply -f deploynginx.yaml'
+          }
         }
       }
     }
-
+  
   }
-
 }
