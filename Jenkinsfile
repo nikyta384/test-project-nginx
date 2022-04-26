@@ -11,7 +11,7 @@ pipeline {
 
     stage('Checkout Source') {
       steps {
-        git 'https://github.com/nikyta384/test-project-nginx.git'
+        git branch: 'test-branch', url: 'https://github.com/nikyta384/test-project-nginx.git'
       }
     }
  
