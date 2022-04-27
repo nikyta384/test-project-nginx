@@ -25,7 +25,7 @@ pipeline {
     stage('Deploy App to Kubernetes') {     
       steps {
         container('kubectl') {
-          withCredentials([file(credentialsId: 'kuber', variable: 'KUBECONFIG')]) {
+          withCredentials([file(credentialsId: 'kuber2', variable: 'KUBECONFIG')]) {
             sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" deploynginx.yaml'
             sh 'kubectl apply -f deploynginx.yaml'
           }
