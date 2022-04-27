@@ -27,7 +27,6 @@ pipeline {
            sshagent(credentials: ['ssh-login']) {
                sh '''
                  whoami
-		 ip a
 		 sleep 99
 		 git clone https://github.com/nikyta384/test-project-nginx.git &&  cd test-project-nginx && kubectl apply -f deploynginx.yaml
 		
