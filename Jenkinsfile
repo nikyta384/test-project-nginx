@@ -24,10 +24,8 @@ pipeline {
 
     stage('Deploy App to Kubernetes') {     
       steps {
-       sh 'sleep 100'
         sshagent (credentials: ['ssh-login']) {
-            sh 'ssh -o StrictHostKeyChecking=no -l pavlovskyi 192.168.1.101 uname -a'
-            sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" deploynginx.yaml'
+            sh 'git clone https://github.com/nikyta384/test-project-nginx.git &&  cd test-project-nginx'
             sh 'kubectl apply -f deploynginx.yaml'
           }
         }
