@@ -24,7 +24,6 @@ pipeline {
 
     stage('Deploy App to Kubernetes') {     
       steps {
-        container('kubectl') {
           withCredentials([file(credentialsId: 'kuber2', variable: 'KUBECONFIG')]) {
             sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" deploynginx.yaml'
             sh 'minikube addons enable ingress'
@@ -32,7 +31,6 @@ pipeline {
           }
         }
       }
-    }
   
   }
 }
