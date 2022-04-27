@@ -26,7 +26,9 @@ pipeline {
         steps {
            sshagent(credentials: ['ssh-login']) {
                sh '''
-                git clone https://github.com/nikyta384/test-project-nginx.git &&  cd test-project-nginx && kubectl apply -f deploynginx.yaml
+                 whoami
+		 ip a
+		 git clone https://github.com/nikyta384/test-project-nginx.git &&  cd test-project-nginx && kubectl apply -f deploynginx.yaml
 		
                   '''
           }
