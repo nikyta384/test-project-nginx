@@ -25,7 +25,7 @@ pipeline {
     stage('Deploy App to Kubernetes') {     
       steps {
         sshagent (credentials: ['ssh-login']) {
-            sh 'ssh -o StrictHostKeyChecking=no -l cloudbees 192.168.1.101 uname -a'
+            sh 'ssh -o StrictHostKeyChecking=no -l pavlovskyi 192.168.1.101 uname -a'
             sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" deploynginx.yaml'
             sh 'kubectl apply -f deploynginx.yaml'
           }
