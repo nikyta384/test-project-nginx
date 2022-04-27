@@ -16,7 +16,7 @@ spec:
         app: nginx-test
     spec:
       containers:
-      - image: nginx:latest
+      - image: nikyta384/nginx-test:latest
         imagePullPolicy: Always
         name: njinx-test
 
