@@ -1,55 +1,41 @@
 pipeline {
 
-  environment {
-    dockerimagename = "nikyta384/nginx-test"
-    dockerImage = ""
+  options {
+    ansiColor('xterm')
   }
 
   agent {
     kubernetes {
-      yaml '''
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          labels:
-            some-label: some-label-value
-        spec:
-          container:
-          - name: maven
-            image: maven:alpine
-
-        '''
+      yamlFile 'builderkaniko.yaml'
     }
   }
 
   stages {
 
-    stage('image') {
-      environment {
-               registryCredential = 'dockerhublogin'
-           }
-
-      steps{
-        container('maven'){
-          script {
-          dockerImage = docker.build dockerimagename
-
-          docker.withRegistry( 'https://registry.hub.docker.com', registryCrede>
-            dockerImage.push("latest")
-          }
-
-      }
-    }
-  }
-
-    stage('Deploying App to Kubernetes') {
+    stage('Kaniko Build & Push Image') {
       steps {
-        script {
-          kubernetesDeploy(configs: "deploynginx.yaml", kubeconfigId: "my_kubernetes")
+        container('kaniko') {
+          script {
+            sh '''
+            /kaniko/executor --dockerfile `pwd`/Dockerfile \
+                             --context `pwd` \
+                             --destination=nikyta384/nginx-test:${BUILD_NUMBER}
+            '''
+          }
         }
       }
     }
 
+    stage('Deploy App to Kubernetes') {     
+      steps {
+        container('kubectl') {
+          withCredentials([file(credentialsId: 'my_kubernetes', variable: 'KUBECONFIG')]) {
+            sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" deploynginx.yaml'
+            sh 'kubectl apply -f deploynginx.yaml'
+          }
+        }
+      }
+    }
+  
   }
-
 }
