@@ -9,6 +9,13 @@ pipeline {
 
   stages {
 
+
+    stage('Checkout Source') {
+      steps {
+        git 'https://github.com/nikyta384/test-project-nginx.git'
+      }
+    }
+
     stage('Build image') {
       steps{
         script {
