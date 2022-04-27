@@ -25,11 +25,9 @@ pipeline {
     stage('Deploy App to Kubernetes') {     
         steps {
            sshagent(credentials: ['ssh-login']) {
-               sh '''
-                 whoami
-		 git clone https://github.com/nikyta384/test-project-nginx.git &&  cd test-project-nginx && kubectl apply -f deploynginx.yaml
-		
-                  '''
+               sh 'git clone https://github.com/nikyta384/test-project-nginx.git'
+               sh 'cd test-project-nginx'
+               sh 'kubectl apply -f deploynginx.yaml'
           }
         }
       }
