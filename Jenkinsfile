@@ -14,12 +14,9 @@ pipeline {
           labels:
             some-label: some-label-value
         spec:
-          containers:
+          container:
           - name: maven
             image: maven:alpine
-            command:
-            - cat
-            tty: true
 
         '''
     }
@@ -27,27 +24,20 @@ pipeline {
 
   stages {
 
-    stage('Build image') {
+    stage('image') {
+      environment {
+               registryCredential = 'dockerhublogin'
+           }
+
       steps{
         container('maven'){
           script {
           dockerImage = docker.build dockerimagename
-        }
-      }
-    }
-  }
 
-    stage('Pushing Image') {
-      environment {
-               registryCredential = 'dockerhublogin'
-           }
-      steps{
-        container('maven'){
-          script {
-          docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) {
+          docker.withRegistry( 'https://registry.hub.docker.com', registryCrede>
             dockerImage.push("latest")
           }
-        }
+
       }
     }
   }
