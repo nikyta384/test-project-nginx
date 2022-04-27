@@ -24,15 +24,13 @@ pipeline {
 
     stage('Deploy App to Kubernetes') {     
       steps {
-        container('kubectl') {
-          withCredentials([file(credentialsId: 'kuber2', variable: 'KUBECONFIG')]) {
+        sshagent (credentials: ['ssh-login']) {
+            sh 'ssh -o StrictHostKeyChecking=no -l cloudbees 192.168.1.101 uname -a'
             sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" deploynginx.yaml'
-            sh 'whoami'
             sh 'kubectl apply -f deploynginx.yaml'
           }
         }
       }
-    }  
 
   }
 }
