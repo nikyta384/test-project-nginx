@@ -1,37 +1,49 @@
 pipeline {
 
-  agent {
-    kubernetes {
-      yamlFile 'builderkaniko.yaml'
-    }
+  environment {
+    dockerimagename = "nginx"
+    dockerImage = ""
   }
+
+  agent any
 
   stages {
 
-    stage('Kaniko Build & Push Image') {
+    stage('Checkout Source') {
       steps {
-        container('kaniko') {
-          script {
-            sh '''
-            /kaniko/executor --dockerfile `pwd`/Dockerfile \
-                             --context `pwd` \
-                             --destination=nikyta384/nginx-test:${BUILD_NUMBER}
-            '''
+        git 'https://github.com/shazforiot/nodeapp_test.git'
+      }
+    }
+
+    stage('Build image') {
+      steps{
+        script {
+          dockerImage = docker.build dockerimagename
+        }
+      }
+    }
+
+    stage('Pushing Image') {
+      environment {
+               registryCredential = 'dockerhublogin'
+           }
+      steps{
+        script {
+          docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) {
+            dockerImage.push("latest")
           }
         }
       }
     }
 
-    stage('Deploy App to Kubernetes') {     
+    stage('Deploying App to Kubernetes') {
       steps {
-        container('kubectl') {
-          withCredentials([file(credentialsId: 'kuber', variable: 'KUBECONFIG')]) {
-            sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" deploynginx.yaml'
-            sh 'kubectl apply -f deploynginx.yaml'
-          }
+        script {
+          kubernetesDeploy(configs: "deploynginx.yaml", kubeconfigId: "kuber")
         }
       }
     }
-  
+
   }
+
 }
