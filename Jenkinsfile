@@ -23,7 +23,6 @@ pipeline {
     }
 
     stage('Deploy App to Kubernetes') {     
-      stage('Hello') {
         steps {
            sshagent(credentials: ['ssh-login']) {
                sh '''
@@ -35,4 +34,4 @@ pipeline {
       }
     }
   }
-}
+
