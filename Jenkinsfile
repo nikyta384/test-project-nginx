@@ -15,7 +15,7 @@ pipeline {
             sh '''
             /kaniko/executor --dockerfile `pwd`/Dockerfile \
                              --context `pwd` \
-                             --destination=nikyta384/nginx-test:${BUILD_NUMBER}
+                             --destination=nikyta384/nginx-test:latest
             '''
            }
          }
