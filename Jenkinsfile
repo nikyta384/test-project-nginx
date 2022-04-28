@@ -17,18 +17,9 @@ pipeline {
                              --context `pwd` \
                              --destination=nikyta384/nginx-test:latest
             '''
-          }
-        }
-      }
-    }
-
-    stage('Deploy App to Kubernetes') {     
-        steps {
-           sshagent(credentials: ['ssh-login']) {
-               sh returnStatus: true, script: 'git clone https://github.com/nikyta384/test-project-nginx.git && cd test-project-nginx && kubectl apply -f deploynginx.yaml'
-          }
-        }
-      }
-    }
-  }
-
+           }
+         }
+       }
+     }
+   }
+ }
